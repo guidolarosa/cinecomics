@@ -6,9 +6,11 @@ import { ArrowLeft, Play, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Project, Frame } from '@/types'
 import { createFrame } from '@/lib/factories'
+import { computeTopLevel, applyTopLevelOrder, groupFrames as getGroupFrames } from '@/lib/frameOrder'
 import { v4 as uuid } from 'uuid'
 import FrameList from './FrameList'
 import FrameEditor from './FrameEditor'
+import ProjectOptionsModal from './ProjectOptionsModal'
 
 interface Props {
   projectId: string
@@ -46,16 +48,11 @@ export default function Editor({ projectId }: Props) {
 
   function addFrame() {
     if (!project) return
-    const frame = createFrame(project.frames.length)
+    const topCount = computeTopLevel(project.frames, project.groups).length
+    const frame = createFrame(topCount)
     const updated = { ...project, frames: [...project.frames, frame] }
     updateProject(updated)
     setSelectedFrameId(frame.id)
-  }
-
-  function reorderFrames(frames: Frame[]) {
-    if (!project) return
-    const reindexed = frames.map((f, i) => ({ ...f, order: i }))
-    updateProject({ ...project, frames: reindexed })
   }
 
   function updateFrame(frame: Frame) {
@@ -68,27 +65,65 @@ export default function Editor({ projectId }: Props) {
 
   function duplicateFrame(id: string) {
     if (!project) return
-    const sorted = project.frames.slice().sort((a, b) => a.order - b.order)
-    const srcIndex = sorted.findIndex((f) => f.id === id)
-    if (srcIndex === -1) return
-    const src = sorted[srcIndex]
-    const copy = { ...src, id: uuid() }
-    // Insert copy right after the source
-    const next = [
-      ...sorted.slice(0, srcIndex + 1),
-      copy,
-      ...sorted.slice(srcIndex + 1),
-    ].map((f, i) => ({ ...f, order: i }))
-    updateProject({ ...project, frames: next })
+    const src = project.frames.find((f) => f.id === id)
+    if (!src) return
+    const copy: Frame = { ...src, id: uuid() }
+    let frames = project.frames
+    let groups = project.groups
+
+    if (src.groupId) {
+      // Insert copy after source within its group
+      const gFrames = getGroupFrames(frames, src.groupId)
+      const srcIdx = gFrames.findIndex((f) => f.id === id)
+      const inserted = [
+        ...gFrames.slice(0, srcIdx + 1),
+        copy,
+        ...gFrames.slice(srcIdx + 1),
+      ].map((f, i) => ({ ...f, order: i }))
+      const nonGroup = frames.filter((f) => f.groupId !== src.groupId)
+      frames = [...nonGroup, ...inserted]
+    } else {
+      // Insert at top-level after source
+      const tl = computeTopLevel(frames, groups)
+      const srcIdx = tl.findIndex((i) => i.id === id)
+      const newTl = [
+        ...tl.slice(0, srcIdx + 1),
+        { kind: 'frame' as const, id: copy.id, order: 0, frame: copy },
+        ...tl.slice(srcIdx + 1),
+      ]
+      const normalized = applyTopLevelOrder(newTl, [...frames, copy], groups)
+      frames = normalized.frames
+      groups = normalized.groups
+    }
+
+    updateProject({ ...project, frames, groups })
     setSelectedFrameId(copy.id)
   }
 
   function deleteFrame(id: string) {
     if (!project) return
-    const frames = project.frames.filter((f) => f.id !== id)
-    const reindexed = frames.map((f, i) => ({ ...f, order: i }))
-    updateProject({ ...project, frames: reindexed })
-    if (selectedFrameId === id) setSelectedFrameId(frames[0]?.id ?? null)
+    const src = project.frames.find((f) => f.id === id)
+    if (!src) return
+    let frames = project.frames.filter((f) => f.id !== id)
+    let groups = project.groups
+
+    if (src.groupId) {
+      // Renumber remaining frames within the group
+      const remaining = getGroupFrames(frames, src.groupId)
+        .map((f, i) => ({ ...f, order: i }))
+      frames = frames.map((f) => remaining.find((r) => r.id === f.id) ?? f)
+    } else {
+      // Renormalize top-level orders
+      const tl = computeTopLevel(frames, groups)
+      const normalized = applyTopLevelOrder(tl, frames, groups)
+      frames = normalized.frames
+      groups = normalized.groups
+    }
+
+    updateProject({ ...project, frames, groups })
+    if (selectedFrameId === id) {
+      setSelectedFrameId(frames[0]?.id ?? null)
+    }
   }
 
   const selectedFrame = project?.frames.find((f) => f.id === selectedFrameId) ?? null
@@ -111,15 +146,7 @@ export default function Editor({ projectId }: Props) {
         <span className="font-semibold text-sm">{project.name}</span>
         {saving && <span className="text-xs text-muted-foreground ml-1">Saving…</span>}
         <div className="flex-1" />
-        <label className="flex items-center gap-1.5 text-xs text-muted-foreground cursor-pointer">
-          Background
-          <input
-            type="color"
-            value={project.backgroundColor ?? '#000000'}
-            onChange={(e) => updateProject({ ...project, backgroundColor: e.target.value })}
-            className="w-6 h-6 rounded cursor-pointer border border-border bg-transparent p-0"
-          />
-        </label>
+        <ProjectOptionsModal project={project} onProjectChange={updateProject} />
         <Button size="sm" onClick={() => router.push(`/projects/${project.id}/present`)}>
           <Play className="w-3 h-3 mr-1" />
           Present
@@ -127,19 +154,14 @@ export default function Editor({ projectId }: Props) {
       </header>
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Frame list sidebar */}
-        <aside className="w-48 border-r flex flex-col shrink-0">
-          <div className="flex items-center justify-between px-3 py-2 border-b">
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Frames</span>
-            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={addFrame}>
-              <Plus className="w-3 h-3" />
-            </Button>
-          </div>
+        {/* Frame list sidebar — FrameList owns its own header with the Plus menu */}
+        <aside className="w-48 border-r flex flex-col shrink-0 overflow-hidden">
           <FrameList
             project={project}
             selectedId={selectedFrameId}
             onSelect={setSelectedFrameId}
-            onReorder={reorderFrames}
+            onProjectChange={updateProject}
+            onAddFrame={addFrame}
             onDuplicate={duplicateFrame}
             onDelete={deleteFrame}
           />

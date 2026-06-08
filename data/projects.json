@@ -1,9 +1,52 @@
 [
   {
     "id": "87b243b2-141b-41c4-989a-d7893585a1d4",
-    "name": "Frecuencia Anomala",
+    "name": "Frecuencia Anómala",
     "createdAt": "2026-06-08T15:16:29.754Z",
     "frames": [
+      {
+        "id": "6ea5a7b2-5fd9-41f0-9d58-f5b43278e436",
+        "order": 0,
+        "assetId": "dc64acda-edf7-46de-9055-5622e14f72d3",
+        "displayMode": "full",
+        "crop": null,
+        "audio": {
+          "backgroundAction": "start",
+          "backgroundAudioId": "ba90d40c-0b24-4ea0-8a4a-72d3ea13754f",
+          "fadeOutDuration": 2
+        },
+        "soundboard": [
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          }
+        ],
+        "transition": "fade",
+        "groupId": null
+      },
       {
         "id": "621803a2-0c28-4123-99b6-3d4be1026004",
         "order": 0,
@@ -12,7 +55,7 @@
         "crop": {
           "x": 1.4374265255958105,
           "y": 25.977755664999812,
-          "width": 24.395283388550464,
+          "width": 25.128121801497276,
           "height": 24.506556158758556
         },
         "audio": {
@@ -48,7 +91,9 @@
           {
             "audioFileId": null
           }
-        ]
+        ],
+        "transition": "zoom",
+        "groupId": "a6223692-4aab-441f-8357-4c1bc50d42a5"
       },
       {
         "id": "66bcf366-90d0-4757-bda9-021fe844fe34",
@@ -94,7 +139,8 @@
           {
             "audioFileId": null
           }
-        ]
+        ],
+        "groupId": "a6223692-4aab-441f-8357-4c1bc50d42a5"
       },
       {
         "id": "f7381b89-8a76-4069-a7a4-cc982ae5733a",
@@ -108,7 +154,7 @@
           "height": 24.184101472459094
         },
         "audio": {
-          "backgroundAction": "none",
+          "backgroundAction": "stop",
           "backgroundAudioId": null,
           "fadeOutDuration": 2
         },
@@ -140,7 +186,8 @@
           {
             "audioFileId": null
           }
-        ]
+        ],
+        "groupId": "a6223692-4aab-441f-8357-4c1bc50d42a5"
       },
       {
         "id": "1f70458b-2665-4f73-a093-14522a990210",
@@ -148,10 +195,10 @@
         "assetId": "34021491-31a4-4478-9a5f-c7a7b9e33756",
         "displayMode": "framing",
         "crop": {
-          "x": 74.16729008585374,
-          "y": 25.655300978700357,
-          "width": 24.623276691247185,
-          "height": 24.345328815608827
+          "x": 74.52830188679245,
+          "y": 25.634178905206944,
+          "width": 23.944980555955638,
+          "height": 24.02843917846377
         },
         "audio": {
           "backgroundAction": "none",
@@ -186,7 +233,8 @@
           {
             "audioFileId": null
           }
-        ]
+        ],
+        "groupId": "a6223692-4aab-441f-8357-4c1bc50d42a5"
       },
       {
         "id": "f93224af-976c-4891-b7d0-691b09e0dbd6",
@@ -232,7 +280,337 @@
           {
             "audioFileId": null
           }
-        ]
+        ],
+        "groupId": "a6223692-4aab-441f-8357-4c1bc50d42a5"
+      },
+      {
+        "id": "79219a85-b7b0-4c55-8f94-728a93f424d8",
+        "order": 5,
+        "assetId": "34021491-31a4-4478-9a5f-c7a7b9e33756",
+        "displayMode": "framing",
+        "crop": {
+          "x": 25.865373623822876,
+          "y": 50.323084480608635,
+          "width": 25.07926329664066,
+          "height": 24.667783501908268
+        },
+        "audio": {
+          "backgroundAction": "none",
+          "backgroundAudioId": null,
+          "fadeOutDuration": 2
+        },
+        "soundboard": [
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          }
+        ],
+        "groupId": "a6223692-4aab-441f-8357-4c1bc50d42a5"
+      },
+      {
+        "id": "bd14ecda-b5bb-4b34-a5d4-88cc1fe45f88",
+        "order": 6,
+        "assetId": "34021491-31a4-4478-9a5f-c7a7b9e33756",
+        "displayMode": "framing",
+        "crop": {
+          "x": 49.91117515054043,
+          "y": 50.053178947545206,
+          "width": 25.07926329664066,
+          "height": 24.667783501908268
+        },
+        "audio": {
+          "backgroundAction": "none",
+          "backgroundAudioId": null,
+          "fadeOutDuration": 2
+        },
+        "soundboard": [
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          }
+        ],
+        "groupId": "a6223692-4aab-441f-8357-4c1bc50d42a5"
+      },
+      {
+        "id": "4391532d-1b15-4e98-9f0e-826cd933b90d",
+        "order": 7,
+        "assetId": "34021491-31a4-4478-9a5f-c7a7b9e33756",
+        "displayMode": "framing",
+        "crop": {
+          "x": 74.33865606657098,
+          "y": 49.783273414481776,
+          "width": 25.07926329664066,
+          "height": 24.667783501908268
+        },
+        "audio": {
+          "backgroundAction": "none",
+          "backgroundAudioId": null,
+          "fadeOutDuration": 2
+        },
+        "soundboard": [
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          }
+        ],
+        "groupId": "a6223692-4aab-441f-8357-4c1bc50d42a5"
+      },
+      {
+        "id": "e03b206f-798e-408e-87aa-f2709c1549fa",
+        "order": 8,
+        "assetId": "34021491-31a4-4478-9a5f-c7a7b9e33756",
+        "displayMode": "framing",
+        "crop": {
+          "x": 1.4378927077923578,
+          "y": 74.61458245631712,
+          "width": 25.07926329664066,
+          "height": 24.667783501908268
+        },
+        "audio": {
+          "backgroundAction": "none",
+          "backgroundAudioId": null,
+          "fadeOutDuration": 2
+        },
+        "soundboard": [
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          }
+        ],
+        "groupId": "a6223692-4aab-441f-8357-4c1bc50d42a5"
+      },
+      {
+        "id": "1f0b29c2-af8a-483f-babf-2d0a229c4b03",
+        "order": 9,
+        "assetId": "34021491-31a4-4478-9a5f-c7a7b9e33756",
+        "displayMode": "framing",
+        "crop": {
+          "x": 25.865373623822897,
+          "y": 74.61458245631712,
+          "width": 25.07926329664066,
+          "height": 24.667783501908268
+        },
+        "audio": {
+          "backgroundAction": "none",
+          "backgroundAudioId": null,
+          "fadeOutDuration": 2
+        },
+        "soundboard": [
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          }
+        ],
+        "groupId": "a6223692-4aab-441f-8357-4c1bc50d42a5"
+      },
+      {
+        "id": "8e19736e-b305-47bf-9362-86bcbd07558e",
+        "order": 10,
+        "assetId": "34021491-31a4-4478-9a5f-c7a7b9e33756",
+        "displayMode": "framing",
+        "crop": {
+          "x": 50.10201484519695,
+          "y": 74.61458245631712,
+          "width": 25.07926329664066,
+          "height": 24.667783501908268
+        },
+        "audio": {
+          "backgroundAction": "none",
+          "backgroundAudioId": null,
+          "fadeOutDuration": 2
+        },
+        "soundboard": [
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          }
+        ],
+        "groupId": "a6223692-4aab-441f-8357-4c1bc50d42a5"
+      },
+      {
+        "id": "d04cd8d4-76a4-47f5-86a9-1bebfc9ad90e",
+        "order": 11,
+        "assetId": "34021491-31a4-4478-9a5f-c7a7b9e33756",
+        "displayMode": "framing",
+        "crop": {
+          "x": 74.33865606657099,
+          "y": 74.3446769232537,
+          "width": 25.07926329664066,
+          "height": 24.667783501908268
+        },
+        "audio": {
+          "backgroundAction": "none",
+          "backgroundAudioId": null,
+          "fadeOutDuration": 2
+        },
+        "soundboard": [
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          }
+        ],
+        "groupId": "a6223692-4aab-441f-8357-4c1bc50d42a5"
       }
     ],
     "assets": [
@@ -243,9 +621,31 @@
         "mimeType": "image/jpeg",
         "width": 4134,
         "height": 5846
+      },
+      {
+        "id": "dc64acda-edf7-46de-9055-5622e14f72d3",
+        "filename": "Screenshot 2026-06-08 at 12.45.37 PM.png",
+        "url": "/uploads/dc64acda-edf7-46de-9055-5622e14f72d3.png",
+        "mimeType": "image/png",
+        "width": 2684,
+        "height": 970
       }
     ],
-    "audioFiles": [],
-    "backgroundColor": "#ffffff"
+    "audioFiles": [
+      {
+        "id": "ba90d40c-0b24-4ea0-8a4a-72d3ea13754f",
+        "filename": "La solitaria Noche del Sultán.mp3",
+        "url": "/uploads/ba90d40c-0b24-4ea0-8a4a-72d3ea13754f.mp3",
+        "mimeType": "audio/mpeg"
+      }
+    ],
+    "backgroundColor": "#ffffff",
+    "groups": [
+      {
+        "id": "a6223692-4aab-441f-8357-4c1bc50d42a5",
+        "name": "Page 1",
+        "order": 1
+      }
+    ]
   }
 ]

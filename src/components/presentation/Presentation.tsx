@@ -117,10 +117,29 @@ export default function Presentation({ projectId }: Props) {
   }
 
   const asset = project.assets.find((a) => a.id === currentFrame.assetId) ?? null
+  const transitionType = currentFrame.transition ?? 'zoom'
+
+  // For 'fade' and 'none', use a key to force remount so the transform doesn't
+  // animate between unrelated frames. 'zoom' keeps the component alive to allow
+  // the CSS transform to animate smoothly.
+  const viewKey = transitionType !== 'zoom' ? frameIndex : undefined
 
   return (
     <div className="w-screen h-screen overflow-hidden" style={{ background: bgColor }}>
-      <FrameView frame={currentFrame} asset={asset} bgColor={bgColor} />
+      <div
+        key={viewKey}
+        className="w-full h-full"
+        style={{
+          animation: transitionType === 'fade' ? 'cc-fade-in 500ms ease-in-out forwards' : undefined,
+        }}
+      >
+        <FrameView
+          frame={currentFrame}
+          asset={asset}
+          bgColor={bgColor}
+          animateTransform={transitionType === 'zoom'}
+        />
+      </div>
     </div>
   )
 }
@@ -146,6 +165,7 @@ interface FrameViewProps {
   frame: Frame
   asset: Asset | null
   bgColor: string
+  animateTransform?: boolean
 }
 
 function computeTransform(
@@ -185,7 +205,7 @@ function computeTransform(
   return `translate(${tx}px, ${ty}px) scale(${zoom})`
 }
 
-function FrameView({ frame, asset, bgColor }: FrameViewProps) {
+function FrameView({ frame, asset, bgColor, animateTransform = true }: FrameViewProps) {
   const { w: vw, h: vh } = useViewportSize()
 
   // Track natural dimensions keyed by asset id — prevents stale dims on asset change.
@@ -224,7 +244,7 @@ function FrameView({ frame, asset, bgColor }: FrameViewProps) {
           objectFit: 'contain',    // browser handles aspect ratio — no stretching possible
           transformOrigin: '0 0',
           transform,
-          transition: 'transform 600ms ease-in-out',
+          transition: animateTransform ? 'transform 600ms ease-in-out' : 'none',
         }}
         onLoad={(e) => {
           const img = e.currentTarget

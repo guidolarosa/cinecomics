@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef } from 'react'
-import { Frame, Project, DisplayMode, AudioAction } from '@/types'
+import { Frame, Project, DisplayMode, AudioAction, TransitionType } from '@/types'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
@@ -61,14 +61,19 @@ export default function FrameEditor({ frame, project, onChange, onProjectChange 
 
   return (
     <div className="flex h-full">
-      {/* Canvas area */}
-      <div className="flex-1 flex items-center justify-center bg-zinc-950 p-6">
+      {/* Canvas area — no padding in framing mode so CropTool fills edge-to-edge */}
+      <div className={
+        frame.displayMode === 'framing' && selectedAsset
+          ? 'flex-1 overflow-hidden bg-zinc-950'
+          : 'flex-1 flex items-center justify-center bg-zinc-950 p-6'
+      }>
         {selectedAsset ? (
           frame.displayMode === 'framing' ? (
             <CropTool
               asset={selectedAsset}
               crop={frame.crop}
               onChange={(crop) => onChange({ ...frame, crop })}
+              onClear={() => onChange({ ...frame, crop: null })}
             />
           ) : (
             // eslint-disable-next-line @next/next/no-img-element
@@ -142,6 +147,26 @@ export default function FrameEditor({ frame, project, onChange, onProjectChange 
             <SelectContent>
               <SelectItem value="full">Full</SelectItem>
               <SelectItem value="framing">Framing (zoom/pan)</SelectItem>
+            </SelectContent>
+          </Select>
+        </section>
+
+        <Separator />
+
+        {/* Transition */}
+        <section className="space-y-2">
+          <Label className="text-xs uppercase tracking-wide text-muted-foreground">Transition</Label>
+          <Select
+            value={frame.transition ?? 'zoom'}
+            onValueChange={(v) => onChange({ ...frame, transition: v as TransitionType })}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="zoom">Zoom / Pan</SelectItem>
+              <SelectItem value="fade">Fade</SelectItem>
+              <SelectItem value="none">None (instant)</SelectItem>
             </SelectContent>
           </Select>
         </section>

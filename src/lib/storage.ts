@@ -44,28 +44,36 @@ async function localSaveAll(projects: Project[]): Promise<void> {
   await atomicWrite(DATA_FILE, JSON.stringify(projects, null, 2))
 }
 
-// ─── Vercel KV storage (prod) ─────────────────────────────────────────────
+// ─── Upstash Redis storage (prod) ────────────────────────────────────────────
+
+function getRedis() {
+  const { Redis } = require('@upstash/redis')
+  return new Redis({
+    url: process.env.CINECOMIC_KV_REST_API_URL!,
+    token: process.env.CINECOMIC_KV_REST_API_TOKEN!,
+  })
+}
 
 async function kvGetAll(): Promise<Project[]> {
-  const { kv } = await import('@vercel/kv')
-  const ids = await kv.smembers<string[]>('project_ids')
+  const redis = getRedis()
+  const ids = await redis.smembers('project_ids') as string[]
   if (!ids || ids.length === 0) return []
   const projects = await Promise.all(
-    ids.map((id) => kv.get<Project>(`project:${id}`))
+    ids.map((id: string) => redis.get(`project:${id}`) as Promise<Project | null>)
   )
   return projects.filter(Boolean) as Project[]
 }
 
 async function kvSave(project: Project): Promise<void> {
-  const { kv } = await import('@vercel/kv')
-  await kv.set(`project:${project.id}`, project)
-  await kv.sadd('project_ids', project.id)
+  const redis = getRedis()
+  await redis.set(`project:${project.id}`, project)
+  await redis.sadd('project_ids', project.id)
 }
 
 async function kvDelete(id: string): Promise<void> {
-  const { kv } = await import('@vercel/kv')
-  await kv.del(`project:${id}`)
-  await kv.srem('project_ids', id)
+  const redis = getRedis()
+  await redis.del(`project:${id}`)
+  await redis.srem('project_ids', id)
 }
 
 // ─── Public API ───────────────────────────────────────────────────────────

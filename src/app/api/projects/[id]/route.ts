@@ -5,7 +5,12 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
   const { id } = await params
   const project = await getProject(id)
   if (!project) return NextResponse.json({ error: 'Not found' }, { status: 404 })
-  return NextResponse.json(project)
+  // Backfill fields added after initial schema
+  const normalized = { ...project, groups: project.groups ?? [] }
+  for (const frame of normalized.frames ?? []) {
+    if (frame.groupId === undefined) frame.groupId = null
+  }
+  return NextResponse.json(normalized)
 }
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
