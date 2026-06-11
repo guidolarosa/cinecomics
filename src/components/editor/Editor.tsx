@@ -183,7 +183,7 @@ export default function Editor({ projectId }: Props) {
               render={
                 <Button
                   size="sm"
-                  className="rounded-l-none border-l border-l-0 px-1"
+                  className="rounded-l-none border-l-0 px-1"
                 />
               }
             >
