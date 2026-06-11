@@ -63,6 +63,8 @@ export interface Project {
   description: string
   createdAt: string
   backgroundColor: string
+  presentationScale: number   // 0.5–1.0, default 1
+  thumbnailAssetId: string | null
   groups: FrameGroup[]
   frames: Frame[]
   assets: Asset[]

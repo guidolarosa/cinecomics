@@ -17,7 +17,7 @@ export async function uploadAsset(file: File): Promise<Asset> {
 
   if (isVercel) {
     const { put } = await import('@vercel/blob')
-    const blob = await put(`assets/${filename}`, file, { access: 'public' })
+    const blob = await put(`assets/${filename}`, file, { access: 'public', token: process.env.BLOB_READ_WRITE_TOKEN })
     // We don't have dimensions at upload time on server; client should send them
     return { id, filename: file.name, url: blob.url, mimeType: file.type, width: 0, height: 0 }
   }
@@ -35,7 +35,7 @@ export async function uploadAudio(file: File): Promise<AudioFile> {
 
   if (isVercel) {
     const { put } = await import('@vercel/blob')
-    const blob = await put(`audio/${filename}`, file, { access: 'public' })
+    const blob = await put(`audio/${filename}`, file, { access: 'public', token: process.env.BLOB_READ_WRITE_TOKEN })
     return { id, filename: file.name, url: blob.url, mimeType: file.type }
   }
 

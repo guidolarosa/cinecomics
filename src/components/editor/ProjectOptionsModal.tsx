@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Asset, AudioFile, Project } from '@/types'
 import {
+  Check,
   ImageIcon,
   Music,
   Pause,
@@ -203,6 +204,74 @@ function GeneralSection({
             {project.backgroundColor ?? '#000000'}
           </span>
         </div>
+      </div>
+
+      <Separator />
+
+      <div className="space-y-2">
+        <Label>Presentation scale</Label>
+        <p className="text-xs text-muted-foreground">
+          Controls how much of the screen the image occupies. 100% fills the screen completely.
+        </p>
+        <div className="flex items-center gap-3">
+          <input
+            type="range"
+            min={50}
+            max={100}
+            step={5}
+            value={Math.round((project.presentationScale ?? 1) * 100)}
+            onChange={(e) =>
+              onProjectChange({ ...project, presentationScale: parseInt(e.target.value) / 100 })
+            }
+            className="flex-1 accent-primary"
+          />
+          <span className="text-sm font-mono w-10 text-right">
+            {Math.round((project.presentationScale ?? 1) * 100)}%
+          </span>
+        </div>
+      </div>
+
+      <Separator />
+
+      <div className="space-y-2">
+        <Label>Cover image</Label>
+        <p className="text-xs text-muted-foreground">
+          Shown on the project card. Defaults to the first frame if not set.
+        </p>
+        {project.assets.length === 0 ? (
+          <p className="text-xs text-muted-foreground italic">No images uploaded yet.</p>
+        ) : (
+          <div className="grid grid-cols-4 gap-2">
+            {project.assets.map((asset) => {
+              const selected = project.thumbnailAssetId === asset.id
+              return (
+                <button
+                  key={asset.id}
+                  onClick={() =>
+                    onProjectChange({
+                      ...project,
+                      thumbnailAssetId: selected ? null : asset.id,
+                    })
+                  }
+                  className={cn(
+                    'relative aspect-video rounded-md overflow-hidden border-2 transition-colors',
+                    selected ? 'border-primary' : 'border-transparent hover:border-muted-foreground/40'
+                  )}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={asset.url} alt={asset.filename} className="w-full h-full object-cover" />
+                  {selected && (
+                    <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
+                      <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                        <Check className="w-3 h-3 text-primary-foreground" />
+                      </div>
+                    </div>
+                  )}
+                </button>
+              )
+            })}
+          </div>
+        )}
       </div>
     </div>
   )

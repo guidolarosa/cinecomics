@@ -30,6 +30,8 @@ export function createProject(name: string): Project {
     description: '',
     createdAt: new Date().toISOString(),
     backgroundColor: '#000000',
+    presentationScale: 1,
+    thumbnailAssetId: null,
     groups: [],
     frames: [createFrame(0)],
     assets: [],

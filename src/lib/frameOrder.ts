@@ -37,3 +37,21 @@ export function applyTopLevelOrder(
 export function groupFrames(frames: Frame[], groupId: string): Frame[] {
   return frames.filter((f) => f.groupId === groupId).sort((a, b) => a.order - b.order)
 }
+
+/**
+ * Flatten frames into presentation order:
+ * top-level items (ungrouped frames + groups) sorted by their order,
+ * with each group expanded to its frames sorted by within-group order.
+ */
+export function flattenFrames(frames: Frame[], groups: FrameGroup[]): Frame[] {
+  const topLevel = computeTopLevel(frames, groups)
+  const result: Frame[] = []
+  for (const item of topLevel) {
+    if (item.kind === 'frame') {
+      result.push(item.frame)
+    } else {
+      result.push(...groupFrames(frames, item.id))
+    }
+  }
+  return result
+}

@@ -611,6 +611,102 @@
           }
         ],
         "groupId": "a6223692-4aab-441f-8357-4c1bc50d42a5"
+      },
+      {
+        "id": "583e84be-72b5-4053-8bdb-75b94fdd275d",
+        "order": 0,
+        "groupId": "bf6c7a1a-4a50-409d-9606-9e67b7ab75a7",
+        "assetId": "aa911dfe-1808-40a9-8f5b-73570510e936",
+        "displayMode": "framing",
+        "crop": {
+          "x": 1.509433962264151,
+          "y": 0.9345794392523363,
+          "width": 24.63560420567478,
+          "height": 24.436540668709878
+        },
+        "transition": "zoom",
+        "audio": {
+          "backgroundAction": "none",
+          "backgroundAudioId": null,
+          "fadeOutDuration": 2
+        },
+        "soundboard": [
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          }
+        ]
+      },
+      {
+        "id": "20066d13-b4f9-4f24-b3ee-866613d25b8a",
+        "order": 1,
+        "groupId": "bf6c7a1a-4a50-409d-9606-9e67b7ab75a7",
+        "assetId": "aa911dfe-1808-40a9-8f5b-73570510e936",
+        "displayMode": "framing",
+        "crop": {
+          "x": 25.36439579432522,
+          "y": 1.0695322057840493,
+          "width": 24.63560420567478,
+          "height": 24.436540668709878
+        },
+        "transition": "zoom",
+        "audio": {
+          "backgroundAction": "none",
+          "backgroundAudioId": null,
+          "fadeOutDuration": 2
+        },
+        "soundboard": [
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          },
+          {
+            "audioFileId": null
+          }
+        ]
       }
     ],
     "assets": [
@@ -629,6 +725,14 @@
         "mimeType": "image/png",
         "width": 2684,
         "height": 970
+      },
+      {
+        "id": "aa911dfe-1808-40a9-8f5b-73570510e936",
+        "filename": "FA - Guido La Rosa - 2.jpg",
+        "url": "/uploads/aa911dfe-1808-40a9-8f5b-73570510e936.jpg",
+        "mimeType": "image/jpeg",
+        "width": 4134,
+        "height": 5846
       }
     ],
     "audioFiles": [
@@ -645,7 +749,13 @@
         "id": "a6223692-4aab-441f-8357-4c1bc50d42a5",
         "name": "Page 1",
         "order": 1
+      },
+      {
+        "id": "bf6c7a1a-4a50-409d-9606-9e67b7ab75a7",
+        "name": "Page 2",
+        "order": 2
       }
-    ]
+    ],
+    "thumbnailAssetId": null
   }
 ]

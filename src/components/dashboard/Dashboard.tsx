@@ -4,10 +4,22 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Plus, Trash2, Play } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Project } from '@/types'
+
+function getThumbnailUrl(project: Project): string | null {
+  if (project.thumbnailAssetId) {
+    return project.assets.find((a) => a.id === project.thumbnailAssetId)?.url ?? null
+  }
+  const firstFrame = project.frames
+    .slice()
+    .sort((a, b) => a.order - b.order)
+    .find((f) => f.assetId)
+  if (!firstFrame?.assetId) return null
+  return project.assets.find((a) => a.id === firstFrame.assetId)?.url ?? null
+}
 
 export default function Dashboard() {
   const router = useRouter()
@@ -63,46 +75,66 @@ export default function Dashboard() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {projects.map((project) => (
-              <Card
-                key={project.id}
-                className="cursor-pointer hover:border-primary transition-colors"
-                onClick={() => router.push(`/projects/${project.id}/edit`)}
-              >
-                <CardHeader>
-                  <CardTitle className="text-base">{project.name}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">
-                    {project.frames.length} frame{project.frames.length !== 1 ? 's' : ''}
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {new Date(project.createdAt).toLocaleDateString()}
-                  </p>
-                </CardContent>
-                <CardFooter className="gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      router.push(`/projects/${project.id}/present`)
-                    }}
-                  >
-                    <Play className="w-3 h-3 mr-1" />
-                    Present
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="text-destructive hover:text-destructive"
-                    onClick={(e) => handleDelete(project.id, e)}
-                  >
-                    <Trash2 className="w-3 h-3" />
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
+            {projects.map((project) => {
+              const thumb = getThumbnailUrl(project)
+              return (
+                <Card
+                  key={project.id}
+                  className="cursor-pointer hover:border-primary transition-colors overflow-hidden p-0"
+                  onClick={() => router.push(`/projects/${project.id}/edit`)}
+                >
+                  {/* Thumbnail */}
+                  <div className="aspect-video bg-muted relative overflow-hidden">
+                    {thumb ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={thumb}
+                        alt={project.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-muted-foreground/40">
+                        <Play className="w-8 h-8" />
+                      </div>
+                    )}
+                  </div>
+
+                  <CardContent className="px-4 pt-3 pb-0">
+                    <p className="font-semibold text-sm truncate">{project.name}</p>
+                    {project.description && (
+                      <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{project.description}</p>
+                    )}
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {project.frames.length} frame{project.frames.length !== 1 ? 's' : ''}
+                      {' · '}
+                      {new Date(project.createdAt).toLocaleDateString()}
+                    </p>
+                  </CardContent>
+
+                  <CardFooter className="gap-2 px-4 py-3">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        router.push(`/projects/${project.id}/present`)
+                      }}
+                    >
+                      <Play className="w-3 h-3 mr-1" />
+                      Present
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="text-destructive hover:text-destructive"
+                      onClick={(e) => handleDelete(project.id, e)}
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </Button>
+                  </CardFooter>
+                </Card>
+              )
+            })}
           </div>
         )}
       </div>

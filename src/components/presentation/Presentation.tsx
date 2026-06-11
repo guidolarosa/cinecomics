@@ -1,8 +1,9 @@
 'use client'
 
 import { useEffect, useRef, useState, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Project, Frame, Asset } from '@/types'
+import { flattenFrames } from '@/lib/frameOrder'
 
 interface Props {
   projectId: string
@@ -10,6 +11,8 @@ interface Props {
 
 export default function Presentation({ projectId }: Props) {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const startFrameId = searchParams.get('frameId')
   const [project, setProject] = useState<Project | null>(null)
   const [frameIndex, setFrameIndex] = useState(0)
 
@@ -20,7 +23,12 @@ export default function Presentation({ projectId }: Props) {
     fetch(`/api/projects/${projectId}`)
       .then((r) => r.json())
       .then((p: Project) => {
-        setProject({ ...p, frames: p.frames.slice().sort((a, b) => a.order - b.order) })
+        const flat = flattenFrames(p.frames, p.groups ?? [])
+        setProject({ ...p, frames: flat })
+        if (startFrameId) {
+          const idx = flat.findIndex((f) => f.id === startFrameId)
+          if (idx !== -1) setFrameIndex(idx)
+        }
       })
   }, [projectId])
 
@@ -124,6 +132,8 @@ export default function Presentation({ projectId }: Props) {
   // the CSS transform to animate smoothly.
   const viewKey = transitionType !== 'zoom' ? frameIndex : undefined
 
+  const scale = project.presentationScale ?? 1
+
   return (
     <div className="w-screen h-screen overflow-hidden" style={{ background: bgColor }}>
       <div
@@ -131,6 +141,8 @@ export default function Presentation({ projectId }: Props) {
         className="w-full h-full"
         style={{
           animation: transitionType === 'fade' ? 'cc-fade-in 500ms ease-in-out forwards' : undefined,
+          transform: scale < 1 ? `scale(${scale})` : undefined,
+          transformOrigin: 'center center',
         }}
       >
         <FrameView
