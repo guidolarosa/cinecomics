@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { memo, useCallback, useEffect, useRef, useState } from 'react'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -34,11 +34,12 @@ interface Props {
   onProjectChange: (project: Project) => void
 }
 
-export default function ProjectOptionsModal({ project, onProjectChange }: Props) {
+function ProjectOptionsModalInner({ project, onProjectChange }: Props) {
   const [open, setOpen] = useState(false)
+  const handleClose = useCallback(() => setOpen(false), [])
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={setOpen} modal="trap-focus">
       <DialogTrigger
         render={<Button variant="ghost" size="icon" title="Project settings" />}
       >
@@ -47,17 +48,20 @@ export default function ProjectOptionsModal({ project, onProjectChange }: Props)
 
       <DialogContent
         showCloseButton={false}
+        keepMounted
         className="sm:max-w-4xl w-full max-h-[85vh] p-0 gap-0 overflow-hidden"
       >
         <ModalBody
           project={project}
           onProjectChange={onProjectChange}
-          onClose={() => setOpen(false)}
+          onClose={handleClose}
         />
       </DialogContent>
     </Dialog>
   )
 }
+
+export default memo(ProjectOptionsModalInner)
 
 // ─── Modal body ───────────────────────────────────────────────────────────────
 
@@ -151,6 +155,9 @@ function GeneralSection({
 }) {
   const [name, setName] = useState(project.name)
   const [description, setDescription] = useState(project.description ?? '')
+  // Local state for continuous inputs — committed only on interaction end
+  const [bgColor, setBgColor] = useState(project.backgroundColor ?? '#000000')
+  const [scale, setScale] = useState(Math.round((project.presentationScale ?? 1) * 100))
 
   function commitName() {
     const t = name.trim() || project.name
@@ -161,6 +168,14 @@ function GeneralSection({
   function commitDescription() {
     if (description !== (project.description ?? ''))
       onProjectChange({ ...project, description })
+  }
+
+  function commitBgColor(value: string) {
+    onProjectChange({ ...project, backgroundColor: value })
+  }
+
+  function commitScale(value: number) {
+    onProjectChange({ ...project, presentationScale: value / 100 })
   }
 
   return (
@@ -196,13 +211,12 @@ function GeneralSection({
         <div className="flex items-center gap-3">
           <input
             type="color"
-            value={project.backgroundColor ?? '#000000'}
-            onChange={(e) => onProjectChange({ ...project, backgroundColor: e.target.value })}
+            value={bgColor}
+            onChange={(e) => setBgColor(e.target.value)}
+            onBlur={(e) => commitBgColor(e.target.value)}
             className="w-10 h-10 rounded-lg cursor-pointer border border-border bg-transparent p-0.5"
           />
-          <span className="text-sm text-muted-foreground font-mono">
-            {project.backgroundColor ?? '#000000'}
-          </span>
+          <span className="text-sm text-muted-foreground font-mono">{bgColor}</span>
         </div>
       </div>
 
@@ -211,7 +225,7 @@ function GeneralSection({
       <div className="space-y-2">
         <Label>Presentation scale</Label>
         <p className="text-xs text-muted-foreground">
-          Controls how much of the screen the image occupies. 100% fills the screen completely.
+          Controls the zoom level for framed panels. 100% zooms into the crop fully; lower values pull back to show more context around it.
         </p>
         <div className="flex items-center gap-3">
           <input
@@ -219,15 +233,12 @@ function GeneralSection({
             min={50}
             max={100}
             step={5}
-            value={Math.round((project.presentationScale ?? 1) * 100)}
-            onChange={(e) =>
-              onProjectChange({ ...project, presentationScale: parseInt(e.target.value) / 100 })
-            }
+            value={scale}
+            onChange={(e) => setScale(parseInt(e.target.value))}
+            onPointerUp={(e) => commitScale(parseInt((e.target as HTMLInputElement).value))}
             className="flex-1 accent-primary"
           />
-          <span className="text-sm font-mono w-10 text-right">
-            {Math.round((project.presentationScale ?? 1) * 100)}%
-          </span>
+          <span className="text-sm font-mono w-10 text-right">{scale}%</span>
         </div>
       </div>
 

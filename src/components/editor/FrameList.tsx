@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { memo, useEffect, useRef, useState } from 'react'
 import {
   DndContext,
   closestCenter,
@@ -58,7 +58,7 @@ interface Props {
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-export default function FrameList({
+function FrameListInner({
   project,
   selectedId,
   onSelect,
@@ -371,6 +371,18 @@ export default function FrameList({
     </div>
   )
 }
+
+// Only re-render when the data that actually affects the list changes.
+// Skips re-renders caused by project metadata changes (backgroundColor, scale, name…)
+// since the callbacks are stable (Editor uses projectRef internally).
+const FrameList = memo(FrameListInner, (prev, next) =>
+  prev.project.frames === next.project.frames &&
+  prev.project.groups === next.project.groups &&
+  prev.project.assets === next.project.assets &&
+  prev.selectedId === next.selectedId,
+)
+
+export default FrameList
 
 // ─── Sortable frame item ───────────────────────────────────────────────────────
 

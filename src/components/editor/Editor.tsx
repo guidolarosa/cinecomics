@@ -24,9 +24,15 @@ export default function Editor({ projectId }: Props) {
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
 
+  // Refs for stable callbacks — always hold the current value without closing over state
+  const projectRef          = useRef<Project | null>(null)
+  const selectedFrameIdRef  = useRef<string | null>(null)
+  projectRef.current         = project
+  selectedFrameIdRef.current = selectedFrameId
+
   // Queue: only one save in-flight at a time; always flushes the latest version.
-  const pendingRef  = useRef<Project | null>(null)
-  const flyingRef   = useRef(false)
+  const pendingRef = useRef<Project | null>(null)
+  const flyingRef  = useRef(false)
 
   useEffect(() => {
     fetch(`/api/projects/${projectId}`)
@@ -61,39 +67,39 @@ export default function Editor({ projectId }: Props) {
     setSaving(false)
   }, [])
 
-  function updateProject(updated: Project) {
+  // Stable: doesn't close over project state
+  const updateProject = useCallback((updated: Project) => {
     setProject(updated)
     pendingRef.current = updated
     flush()
-  }
+  }, [flush])
 
-  function addFrame() {
-    if (!project) return
-    const topCount = computeTopLevel(project.frames, project.groups).length
+  // All mutation callbacks are stable — they read fresh data via projectRef
+  const addFrame = useCallback(() => {
+    const p = projectRef.current
+    if (!p) return
+    const topCount = computeTopLevel(p.frames, p.groups).length
     const frame = createFrame(topCount)
-    const updated = { ...project, frames: [...project.frames, frame] }
-    updateProject(updated)
+    updateProject({ ...p, frames: [...p.frames, frame] })
     setSelectedFrameId(frame.id)
-  }
+  }, [updateProject])
 
-  function updateFrame(frame: Frame) {
-    if (!project) return
-    updateProject({
-      ...project,
-      frames: project.frames.map((f) => (f.id === frame.id ? frame : f)),
-    })
-  }
+  const updateFrame = useCallback((frame: Frame) => {
+    const p = projectRef.current
+    if (!p) return
+    updateProject({ ...p, frames: p.frames.map((f) => (f.id === frame.id ? frame : f)) })
+  }, [updateProject])
 
-  function duplicateFrame(id: string) {
-    if (!project) return
-    const src = project.frames.find((f) => f.id === id)
+  const duplicateFrame = useCallback((id: string) => {
+    const p = projectRef.current
+    if (!p) return
+    const src = p.frames.find((f) => f.id === id)
     if (!src) return
     const copy: Frame = { ...src, id: uuid() }
-    let frames = project.frames
-    let groups = project.groups
+    let frames = p.frames
+    let groups = p.groups
 
     if (src.groupId) {
-      // Insert copy after source within its group
       const gFrames = getGroupFrames(frames, src.groupId)
       const srcIdx = gFrames.findIndex((f) => f.id === id)
       const inserted = [
@@ -104,7 +110,6 @@ export default function Editor({ projectId }: Props) {
       const nonGroup = frames.filter((f) => f.groupId !== src.groupId)
       frames = [...nonGroup, ...inserted]
     } else {
-      // Insert at top-level after source
       const tl = computeTopLevel(frames, groups)
       const srcIdx = tl.findIndex((i) => i.id === id)
       const newTl = [
@@ -117,35 +122,34 @@ export default function Editor({ projectId }: Props) {
       groups = normalized.groups
     }
 
-    updateProject({ ...project, frames, groups })
+    updateProject({ ...p, frames, groups })
     setSelectedFrameId(copy.id)
-  }
+  }, [updateProject])
 
-  function deleteFrame(id: string) {
-    if (!project) return
-    const src = project.frames.find((f) => f.id === id)
+  const deleteFrame = useCallback((id: string) => {
+    const p = projectRef.current
+    if (!p) return
+    const src = p.frames.find((f) => f.id === id)
     if (!src) return
-    let frames = project.frames.filter((f) => f.id !== id)
-    let groups = project.groups
+    let frames = p.frames.filter((f) => f.id !== id)
+    let groups = p.groups
 
     if (src.groupId) {
-      // Renumber remaining frames within the group
       const remaining = getGroupFrames(frames, src.groupId)
         .map((f, i) => ({ ...f, order: i }))
       frames = frames.map((f) => remaining.find((r) => r.id === f.id) ?? f)
     } else {
-      // Renormalize top-level orders
       const tl = computeTopLevel(frames, groups)
       const normalized = applyTopLevelOrder(tl, frames, groups)
       frames = normalized.frames
       groups = normalized.groups
     }
 
-    updateProject({ ...project, frames, groups })
-    if (selectedFrameId === id) {
+    updateProject({ ...p, frames, groups })
+    if (selectedFrameIdRef.current === id) {
       setSelectedFrameId(frames[0]?.id ?? null)
     }
-  }
+  }, [updateProject])
 
   const selectedFrame = project?.frames.find((f) => f.id === selectedFrameId) ?? null
 
@@ -207,7 +211,7 @@ export default function Editor({ projectId }: Props) {
       </header>
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Frame list sidebar — FrameList owns its own header with the Plus menu */}
+        {/* Frame list sidebar */}
         <aside className="w-48 border-r flex flex-col shrink-0 overflow-hidden">
           <FrameList
             project={project}

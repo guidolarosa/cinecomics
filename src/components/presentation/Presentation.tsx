@@ -182,8 +182,6 @@ export default function Presentation({ projectId }: Props) {
         className="w-full h-full"
         style={{
           animation: transitionType === 'fade' ? 'cc-fade-in 500ms ease-in-out forwards' : undefined,
-          transform: scale < 1 ? `scale(${scale})` : undefined,
-          transformOrigin: 'center center',
         }}
       >
         <FrameView
@@ -191,6 +189,7 @@ export default function Presentation({ projectId }: Props) {
           asset={asset}
           bgColor={bgColor}
           animateTransform={transitionType === 'zoom'}
+          scale={scale}
         />
       </div>
 
@@ -281,30 +280,41 @@ interface FrameViewProps {
   asset: Asset | null
   bgColor: string
   animateTransform?: boolean
+  scale?: number
 }
 
-function computeTransform(frame: Frame, iw: number, ih: number, vw: number, vh: number): string {
+function computeTransform(
+  frame: Frame,
+  iw: number,
+  ih: number,
+  vw: number,
+  vh: number,
+  scale = 1,
+): string {
   if (frame.displayMode === 'full' || !frame.crop || !iw || !ih) return 'none'
 
   const { x, y, width, height } = frame.crop
 
-  const fitScale   = Math.min(vw / iw, vh / ih)
-  const fw         = iw * fitScale
-  const fh         = ih * fitScale
-  const imgLeft    = (vw - fw) / 2
-  const imgTop     = (vh - fh) / 2
+  const fitScale    = Math.min(vw / iw, vh / ih)
+  const fw          = iw * fitScale
+  const fh          = ih * fitScale
+  const imgLeft     = (vw - fw) / 2
+  const imgTop      = (vh - fh) / 2
   const cropCenterX = imgLeft + (x + width  / 2) / 100 * fw
   const cropCenterY = imgTop  + (y + height / 2) / 100 * fh
-  const cropW      = width  / 100 * fw
-  const cropH      = height / 100 * fh
-  const zoom       = Math.min(vw / cropW, vh / cropH)
-  const tx         = vw / 2 - cropCenterX * zoom
-  const ty         = vh / 2 - cropCenterY * zoom
+  const cropW       = width  / 100 * fw
+  const cropH       = height / 100 * fh
+
+  // Base zoom fills the viewport with the crop; scale pulls it back out
+  const zoom = Math.min(vw / cropW, vh / cropH) * scale
+
+  const tx = vw / 2 - cropCenterX * zoom
+  const ty = vh / 2 - cropCenterY * zoom
 
   return `translate(${tx}px, ${ty}px) scale(${zoom})`
 }
 
-function FrameView({ frame, asset, bgColor, animateTransform = true }: FrameViewProps) {
+function FrameView({ frame, asset, bgColor, animateTransform = true, scale = 1 }: FrameViewProps) {
   const { w: vw, h: vh } = useViewportSize()
 
   const [loaded, setLoaded] = useState<{ id: string; w: number; h: number } | null>(
@@ -316,14 +326,15 @@ function FrameView({ frame, asset, bgColor, animateTransform = true }: FrameView
     else setLoaded(null)
   }, [asset?.id, asset?.width, asset?.height])
 
-  if (!asset) return <div className="w-full h-full" />
+  if (!asset) return <div className="w-full h-full" style={{ background: bgColor }} />
 
   const iw        = loaded?.id === asset.id ? loaded.w : 0
   const ih        = loaded?.id === asset.id ? loaded.h : 0
-  const transform = computeTransform(frame, iw, ih, vw, vh)
+  // scale reduces the crop zoom — the image always fills the full viewport
+  const transform = computeTransform(frame, iw, ih, vw, vh, scale)
 
   return (
-    <div className="w-full h-full overflow-hidden relative" style={{ background: bgColor }}>
+    <div className="w-full h-full relative overflow-hidden" style={{ background: bgColor }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={asset.url}

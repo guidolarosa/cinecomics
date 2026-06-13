@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { memo, useRef } from 'react'
 import { Frame, Project, DisplayMode, AudioAction, TransitionType } from '@/types'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -18,7 +18,7 @@ interface Props {
   onProjectChange: (project: Project) => void
 }
 
-export default function FrameEditor({ frame, project, onChange, onProjectChange }: Props) {
+export default memo(function FrameEditor({ frame, project, onChange, onProjectChange }: Props) {
   const assetInputRef = useRef<HTMLInputElement>(null)
   const audioInputRef = useRef<HTMLInputElement>(null)
 
@@ -257,7 +257,7 @@ export default function FrameEditor({ frame, project, onChange, onProjectChange 
       </aside>
     </div>
   )
-}
+})
 
 function getImageDimensions(file: File): Promise<{ width: number; height: number }> {
   return new Promise((resolve) => {
